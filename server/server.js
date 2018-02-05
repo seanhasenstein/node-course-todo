@@ -31,17 +31,13 @@ app.get('/todos', (req, res) => {
   });
 });
 
-// GET /todos/124332
 app.get('/todos/:id', (req, res) => {
   const id = req.params.id;
 
-  // validate id using isValid
-    // 404 if the id is not valid - send back empty body
     if (!ObjectID.isValid(id)) {
-      res.status(404).send();
+      return res.status(404).send();
     }
 
-  // findById
   Todo.findById(id).then((todo) => {
     if (!todo) {
       return res.status(404).send();
@@ -51,11 +47,24 @@ app.get('/todos/:id', (req, res) => {
   }).catch((e) => {
     res.status(400).send();
   });
-    // success
-      // if todo - send it back
-      // if no todo - send back 404 with empty body
-    //error
-      // 400 and send empty body back
+});
+
+app.delete('/todos/:id', (req, res) => {
+  const id = req.params.id;
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send();
+  }
+
+  Todo.findByIdAndRemove(id).then((todo) => {
+    if (!todo) {
+      res.status(404).send();
+    }
+
+    res.send(todo);
+  }).catch((e) => {
+    res.status(400).send();
+  });
 });
 
 app.listen(port, () => {
